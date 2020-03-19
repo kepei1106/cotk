@@ -14,22 +14,25 @@ class Context(metaclass=DocStringInheritor):
 	'''A base class for Context. This class is used for setting parameters
 	for :class:`Field` or :class:`Vocab`, without directly
 	passing parameters to ``__init__`` of the object.
-
 	When initialized, the object write the list of parameters stored in the class.
 	The old parameters are restored when :meth:`.close` or :meth:`.__exit__` is called.
-
 	TODO: add an example for context manager, use ``with``.
-
 	Arguments:
 		parameter_dict (Dict[str, Any]): Key-value dict for changed parameters.
 		weak (bool, optional): Overwrite existing parameters. Default: False.
 	'''
 
 	context_dict: Dict[str, Any] = {}
+	corrupted = False
 
 	def __init__(self, parameter_dict: Dict[str, Any], weak=False):
+		if self.__class__.corrupted:
+			raise RuntimeError("A context object do not close before becoming invalid. Use ``with`` statement, " \
+				"or make sure of calling close.")
+
 		self._parameter_keys = list(parameter_dict)
 		self._old_parameters = self._set_parameters(parameter_dict, weak=weak)
+		self._closed = False
 
 	@classmethod
 	def _set_parameters(cls, parameter_dict: Dict[str, Any], weak=False) -> List[Any]:
@@ -47,7 +50,6 @@ class Context(metaclass=DocStringInheritor):
 		'''Get the value of parameter named ``key`` stored in this class.
 		If ``key`` is not set, return ``default``.
 		When ``no_default`` is ``True``, raise a KeyError if ``key`` is not set.
-
 		Arguments:
 			key (str): name of the parameter
 			default (Any, optional): Default value if ``key`` is not set. Defaults: None.
@@ -66,7 +68,6 @@ class Context(metaclass=DocStringInheritor):
 		'''Set the parameter named ``key`` to ``value``, stored in this class.
 		If weak is ``True``, do not overwrite if ``key`` is already set.
 		Return the old value.
-
 		Arguments:
 			key (str): The name of the changed parameter.
 			value (Any): The new value of changed parameter. If None, do nothing.
@@ -100,15 +101,22 @@ class Context(metaclass=DocStringInheritor):
 	def close(self):
 		'''Restore the old parameter.'''
 		self._restore(self._parameter_keys, self._old_parameters)
+		self._closed = True
+
+	def __del__(self):
+		if hasattr(self, "_closed") and not self._closed:
+			self.__class__.corrupted = True
+			raise RuntimeError("A context object do not close before becoming invalid. Use ``with`` statement, " \
+				"or make sure of calling close.")
 
 class FieldContext(Context):
 	'''Bases: :class:`.dataloader.Context`
-
 	A context class for setting parameters for :class:`.Field`.
 	'''
 
 	PARAMETER_LIST = ["tokenizer", "vocab", "vocab_from", "max_sent_length", "max_turn_length", "convert_to_lower_letter"]
 	context_dict = {key: None for key in PARAMETER_LIST}
+	corrupted = False
 
 	# pylint: disable=unused-argument
 	@classmethod
@@ -122,7 +130,6 @@ class FieldContext(Context):
 			weak=False) -> "FieldContext":
 		'''Set a Context for initialization of :class:`Field`.
 		See the example at TODO: write an example for how to use field context.
-
 		Arguments:
 			TODO: fill the parameters from Field classes.
 		'''
@@ -131,12 +138,12 @@ class FieldContext(Context):
 
 class VocabContext(Context):
 	'''Bases: :class:`.dataloader.Context`
-
 	A context class for setting parameters for :class:`.Vocab`.
 	'''
 
 	PARAMETER_LIST = ["min_frequent_vocab_times", "min_rare_vocab_times", "special_tokens_mapping", "special_appeared_in_data"]
 	context_dict = {key: None for key in PARAMETER_LIST}
+	corrupted = False
 
 	# pylint: disable=unused-argument
 	@classmethod
@@ -148,7 +155,6 @@ class VocabContext(Context):
 			weak=False) -> "VocabContext":
 		'''Set a Context for initialization of :class:`Vocab`.
 		See the example at TODO: write an example for how to use field context.
-
 		Arguments:
 			TODO: fill the parameters from Vocab classes.
 		'''
