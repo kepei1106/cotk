@@ -8,9 +8,9 @@ def metric_output(metric_class, data, dataloader=None):
     name = metric_class._name
     version = metric_class._version
     if isinstance(dataloader, FakeMultiDataloader):
-        tmp_file_id = "resources://Ubuntu_small"
+        tmp_file_id = "../dataloader/dummy_ubuntucorpus#Ubuntu"
     else:
-        tmp_file_id = "resources://MSCOCO_small"
+        tmp_file_id = '../dataloader/dummy_languageprocessing'
     if dataloader:
         tmp_set_names = ["train", "dev", "test"]
         tmp_vocab = GeneralVocab.from_predefined(data['init']['dataloader']['all_vocab_list'], \
@@ -326,7 +326,6 @@ with open("version_test_data/MultiTurnPerplexityMetric_v2.jsonl", "w") as file:
                        'multi_turn_reference_allvocabs_key': '_multi_turn_ref_allvocabs',
                         'multi_turn_reference_len_key': '_multi_turn_ref_length',
                        'multi_turn_gen_log_prob_key': '_multi_turn_gen_log_prob',
-                       #'invalid_vocab': use_all_vocab,
                        'generate_rare_vocab': use_all_vocab,
                        'full_check': False},
               'forward': []}
