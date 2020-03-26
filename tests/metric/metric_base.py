@@ -20,7 +20,7 @@ from cotk.file_utils import get_resource_file_path
 class FakeDataLoader(LanguageProcessing):
 	def __init__(self):
 
-		self.file_id = "resources://MSCOCO_small"
+		self.file_id = './tests/dataloader/dummy_languageprocessing'
 		self.file_path = get_resource_file_path(self.file_id)
 
 		all_vocab_list = ['<pad>', '<unk>', '<go>', '<eos>', \
@@ -151,7 +151,7 @@ class FakeDataLoader(LanguageProcessing):
 class FakeMultiDataloader(MultiTurnDialog):
 	def __init__(self):
 
-		self.file_id = "resources://Ubuntu_small"
+		self.file_id = "./tests/dataloader/dummy_ubuntucorpus#Ubuntu"
 		self.file_path = get_resource_file_path(self.file_id)
 
 		all_vocab_list = ['<pad>', '<unk>', '<go>', '<eos>', \
@@ -446,11 +446,11 @@ def generate_unequal_data(data, key_list, pad_id, reference_key, \
 def version_test(metric_class, dataloader=None):
 	name = metric_class._name
 	version = metric_class._version
-	filename = './version_test_data/{}_v{}.jsonl'.format(name, version)
+	filename = './tests/metric/version_test_data/{}_v{}.jsonl'.format(name, version)
 	if isinstance(dataloader, FakeMultiDataloader):
-		tmp_file_id = "resources://Ubuntu_small"
+		tmp_file_id = "./tests/dataloader/dummy_ubuntucorpus#Ubuntu"
 	else:
-		tmp_file_id = "resources://MSCOCO_small"
+		tmp_file_id = './tests/dataloader/dummy_languageprocessing'
 	with open(filename, "r") as file:
 		for line in file:
 			data = json.loads(line)
