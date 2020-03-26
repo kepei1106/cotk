@@ -68,11 +68,9 @@ class FakeDataLoader(LanguageProcessing):
 		sen = []
 		for i in range(len):
 			if all_vocab:
-				#vocab = random.randrange(self.word2id['<eos>'], self.all_vocab_size)
-				vocab = random.randrange(self.vocabs[0].eos_id, self.vocabs[0].all_vocab_size)
+				vocab = random.randrange(self.eos_id, self.all_vocab_size)
 			else:
-				#vocab = random.randrange(self.word2id['<eos>'], self.vocab_size)
-				vocab = random.randrange(self.vocabs[0].eos_id, self.vocabs[0].frequent_vocab_size)
+				vocab = random.randrange(self.eos_id, self.frequent_vocab_size)
 			if vocab == self.eos_id:
 				vocab = self.unk_id
 			# consider unk
