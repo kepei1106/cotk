@@ -122,8 +122,6 @@ class BleuCorpusMetric(MetricBase):
 			raise TypeError("Unknown type for resp")
 
 		if len(resp) != len(gen):
-			print(gen)
-			print(resp)
 			raise ValueError("Batch num is not matched.")
 
 		relevant_data = []
