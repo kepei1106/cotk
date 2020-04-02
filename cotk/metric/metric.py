@@ -24,19 +24,19 @@ class MetricBase(LoadClassInterface, metaclass=DocStringInheritor):
 			BLEU. Default: ``False``."""
 	SAMPLE_ARGUMENTS_IN_BLEU = \
 		"""sample (int, optional): Number of examples sampled from the generated sentences. Default: ``1000``."""
-	SAMPLE_ARGUMENTS_IN_PERPLEXITY = \
+	SAMPLE_ARGUMENTS_IN_NGRAM_PERPLEXITY = \
 		SAMPLE_ARGUMENTS_IN_BLEU.replace("Default: ``1000``.", "Default: ``10000``.")
 	SEED_ARGUMENTS = \
 		"""seed (int, optional): Random seed for sampling. Default: ``1229``."""
 	REFERENCE_TEST_LIST_ARGUMENTS = \
-		"""reference_test_list (list): Reference sentences with :ref:`all vocabs <vocab_ref>` in test data."""
+		"""reference_test_list (list): Reference sentences with :ref:`all vocabs <vocabulary_ref>` in test data."""
 	REFERENCE_ALLVOCABS_KEY_ARGUMENTS = \
 		"""reference_allvocabs_key (str, optional): \
 			The key of reference sentences. Default: ``ref_allvocabs``."""
 	FORWARD_REFERENCE_ALLVOCABS_ARGUMENTS = \
 				"""* **data[reference_allvocabs_key]** (list, :class:`numpy.ndarray`): \
 				  A 2-d jagged or padded array of int. Reference sentences with \
-				  :ref:`allvocabs <vocab_ref>` in index form. \
+				  :ref:`allvocabs <vocabulary_ref>` in index form. \
 				  Contains start token (eg: ``<go>``) and end token (eg: ``<eos>``). \
 				  Size: ``[batch_size, ~ref_sentence_length]``, \
 				  where "~" means different sizes in this dimension is allowed."""
@@ -72,7 +72,7 @@ class MetricBase(LoadClassInterface, metaclass=DocStringInheritor):
 	FORWARD_MULTI_TURN_REFERENCE_ALLVOCABS_ARGUMENTS = \
 				"""* **data[multi_turn_reference_allvocabs_key]** (list, :class:`numpy.ndarray`): \
 				  A 3-d jagged or padded array of int. Multi-turn reference sentences with \
-				  :ref:`all vocabs <vocab_ref>`. Contains start token (eg: ``<go>``) and \
+				  :ref:`all vocabs <vocabulary_ref>`. Contains start token (eg: ``<go>``) and \
 				  end token (eg: ``<eos>``). Size: ``[batch_size, ~turn_length, ~sentence_length]``, \
 				  where "~" means different sizes in this dimension is allowed."""
 	FORWARD_MULTI_TURN_REFERENCE_ALLVOCABS_ARGUMENTS_WITH_TORCH = \
@@ -103,10 +103,10 @@ class MetricBase(LoadClassInterface, metaclass=DocStringInheritor):
 		"""gen_key (str, optional): \
 			The key of generated sentences. Default: ``gen``."""
 	GEN_LOG_PROB_KEY_ARGUMENTS = \
-		"""gen_log_prob_key (str, optional): The key of **log** probability over words. \
+		"""gen_log_prob_key (str, optional): The key of predicted **log** probability over words. \
 			Default: ``gen_log_prob``."""
 	GENERATE_RARE_VOCAB_ARGUMENTS = \
-		"""generate_rare_vocab (bool, optional): Whether ``gen_log_prob`` contains :ref:`invalid vocab <vocab_ref>`. \
+		"""generate_rare_vocab (bool, optional): Whether ``gen_log_prob`` contains :ref:`invalid vocab <vocabulary_ref>`. \
 			Default: ``False``."""
 	FULL_CHECK_ARGUMENTS = \
 		"""full_check (bool, optional): Whether to perform a full check on ``gen_log_prob`` to make sure the sum
@@ -141,8 +141,8 @@ class MetricBase(LoadClassInterface, metaclass=DocStringInheritor):
 
 	CPU_COUNT_ARGUMENTS = \
 		"""cpu_count (int, optional): Number of used cpu for multiprocessing. Multiprocessing will **NOT** be used \
-			when ``cpu_count`` is set to ``1`` or the dataset is small. Default: ``None``, which indicates \
-			the environment variable ``CPU_COUNT`` will be used	when it is set, \
+			when ``cpu_count`` is set to ``1`` or the dataset is small. Default: If ``None``, \
+			the environment variable ``CPU_COUNT`` will be used when available, \
 			or all available cpu will be used otherwise."""
 
 	def __init__(self, name: str, version: int):
@@ -204,7 +204,7 @@ class MetricChain(MetricBase):
 	Todo: Give more examples to combining forward and close
 	'''
 	_name = 'MetricChain'
-	_version = 1
+	_version = 2
 	def __init__(self):
 		super().__init__(self._name, self._version)
 		self.metric_list = []
